@@ -18,11 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.0
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.0
+import QtQuick 
+import QtQuick.Layouts 
+import QtQuick.Controls 
+import org.kde.kirigami as Kirigami
+import org.kde.kcmutils as KCM
 
-Item {
+KCM.SimpleKCM {
     property int cfg_labeling: 0
     property alias cfg_usePortDescription: usePortDescription.checked
 
@@ -30,14 +32,13 @@ Item {
     
     property alias cfg_sourceInsteadofSink: sourceInsteadofSink.checked
 
-    property string cfg_defaultIconName: ""
+    property string cfg_defaultIconName:  defaultIconName
 
-    ColumnLayout {
+    Kirigami.FormLayout {
         Layout.fillWidth: true
 
         ColumnLayout {
             id: labeling
-            ExclusiveGroup { id: labelingGroup }
             Repeater {
                 id: buttonRepeater
                 model: [
@@ -48,7 +49,7 @@ Item {
                 RadioButton {
                     text: modelData
                     checked: index === cfg_labeling
-                    exclusiveGroup: labelingGroup
+                    autoExclusive: true
                     onClicked: {
                         cfg_labeling = index
                     }
@@ -76,6 +77,9 @@ Item {
             topPadding: 25
         }
         ComboBox {
+            textRole: "text"
+            valueRole: "value"
+
             id: defaultIconName
             model: ListModel {
                     id: cbItems
@@ -85,7 +89,8 @@ Item {
                     ListElement { text: "Microphone"; value: "audio-input-microphone-symbolic" }
                     ListElement { text: "Audio card"; value: "audio-card" }
             }
-            onCurrentIndexChanged: cfg_defaultIconName = cbItems.get(currentIndex).value
+            Component.onCompleted: currentIndex = indexOfValue(cfg_defaultIconName)
+            onActivated: cfg_defaultIconName = currentValue //cbItems.get(currentIndex).value
         }
     }
 }

@@ -18,23 +18,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.2
+import QtQuick 6.0
 import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.2 as QtControls
+import QtQuick.Controls 6.0 as QtControls
 
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
+//import org.kde.plasma.components 5.62 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
 
 // plasma pulseaudio plugin
 import org.kde.plasma.private.volume 0.1
 
-Item {
+PlasmoidItem {
     id: main
 
     Layout.minimumWidth: gridLayout.implicitWidth
     Layout.minimumHeight: gridLayout.implicitHeight
-    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
+    preferredRepresentation: fullRepresentation
 
     property int labeling: plasmoid.configuration.labeling
     property bool usePortDescription: plasmoid.configuration.usePortDescription
@@ -261,23 +261,23 @@ Item {
         flow: useVerticalLayout? GridLayout.TopToBottom : GridLayout.LeftToRight
         anchors.fill: parent
 
-        QtControls.ExclusiveGroup {
-            id: buttonGroup
-        }
-
         Repeater {
             model: filteredModel
 
-            delegate: PlasmaComponents.ToolButton {
+            delegate: QtControls.ToolButton {
                 id: tab
                 enabled: currentPort !== null
 
                 text: labeling != 2 ? currentDescription + (device.muted ? " (muted)" : "") : ""
-                iconName: labeling != 1 ? formFactorIcon(device, currentPort, defaultIconName) : ""
+                icon.name: labeling != 1 ? formFactorIcon(device, currentPort, defaultIconName) : ""
 
                 checkable: true
-                exclusiveGroup: buttonGroup
-                tooltip: currentDescription
+                autoExclusive: true
+
+                QtControls.ToolTip {
+                    visible: hovered
+                    text: currentDescription
+                }
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true

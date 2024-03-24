@@ -18,11 +18,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.0
+import QtQuick
 import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.0
+import QtQuick.Controls 2.5
 
-PlasmoidItem {
+import org.kde.kirigami 2.5 as Kirigami
+import org.kde.kcmutils as KCM
+
+KCM.SimpleKCM {
     property int cfg_labeling: 0
     property alias cfg_usePortDescription: usePortDescription.checked
 
@@ -32,60 +35,60 @@ PlasmoidItem {
 
     property string cfg_defaultIconName: ""
 
-    ColumnLayout {
-        Layout.fillWidth: true
-
+    Kirigami.FormLayout {
         ColumnLayout {
-            id: labeling
-            ExclusiveGroup { id: labelingGroup }
-            Repeater {
-                id: buttonRepeater
-                model: [
-                    i18n("Show icon with description"),
-                    i18n("Show description only"),
-                    i18n("Show icon only")
-                ]
-                RadioButton {
-                    text: modelData
-                    checked: index === cfg_labeling
-                    exclusiveGroup: labelingGroup
-                    onClicked: {
-                        cfg_labeling = index
+            Layout.fillWidth: true
+
+            ColumnLayout {
+                id: labeling
+                Repeater {
+                    id: buttonRepeater
+                    model: [
+                        i18n("Show icon with description"),
+                        i18n("Show description only"),
+                        i18n("Show icon only")
+                    ]
+                    RadioButton {
+                        text: modelData
+                        checked: index === cfg_labeling
+                        onClicked: {
+                            cfg_labeling = index
+                        }
                     }
                 }
             }
-        }
 
-        CheckBox {
-            id: usePortDescription
-            text: i18n("Use the port description rather than the device description")
-        }
-
-        CheckBox {
-            id: useVerticalLayout
-            text: i18n("Use vertical layout")
-        }
-
-        CheckBox {
-            id: sourceInsteadofSink
-            text: i18n("Control source instead of sink")
-        }
-
-        Label {
-            text: i18n("Default icon")
-            topPadding: 25
-        }
-        ComboBox {
-            id: defaultIconName
-            model: ListModel {
-                    id: cbItems
-                    ListElement { text: "Speakers"  ; value: "audio-speakers-symbolic" }
-                    ListElement { text: "Headphones"; value: "audio-headphones" }
-                    ListElement { text: "Headset"   ; value: "audio-headset" }
-                    ListElement { text: "Microphone"; value: "audio-input-microphone-symbolic" }
-                    ListElement { text: "Audio card"; value: "audio-card" }
+            CheckBox {
+                id: usePortDescription
+                text: i18n("Use the port description rather than the device description")
             }
-            onCurrentIndexChanged: cfg_defaultIconName = cbItems.get(currentIndex).value
+
+            CheckBox {
+                id: useVerticalLayout
+                text: i18n("Use vertical layout")
+            }
+
+            CheckBox {
+                id: sourceInsteadofSink
+                text: i18n("Control source instead of sink")
+            }
+
+            Label {
+                text: i18n("Default icon")
+                topPadding: 25
+            }
+            ComboBox {
+                id: defaultIconName
+                model: ListModel {
+                        id: cbItems
+                        ListElement { text: "Speakers"  ; value: "audio-speakers-symbolic" }
+                        ListElement { text: "Headphones"; value: "audio-headphones" }
+                        ListElement { text: "Headset"   ; value: "audio-headset" }
+                        ListElement { text: "Microphone"; value: "audio-input-microphone-symbolic" }
+                        ListElement { text: "Audio card"; value: "audio-card" }
+                }
+                onCurrentIndexChanged: cfg_defaultIconName = cbItems.get(currentIndex).value
+            }
         }
     }
 }

@@ -6,6 +6,7 @@
   <kcfgfile name=""/>
 
   <group name="General">
+
     <entry name="labeling" type="Enum">
       <choices>
         <choice name="iconWithDescription">
@@ -20,18 +21,34 @@
         <default>iconWithDescription</default>
       </choices>
     </entry>
-    <entry name="usePortDescription" type="Bool">
-      <default>false</default>
+
+    <entry name="naming" type="Enum">
+      <choices>
+        <choice name="deviceDescription">
+          <label>Device description</label>
+        </choice>
+        <choice name="portDescription">
+          <label>Port description</label>
+        </choice>
+        <choice name="nodeNickname">
+          <label>Node nickname</label>
+        </choice>
+        <default>deviceDescription</default>
+      </choices>
     </entry>
+
     <entry name="useVerticalLayout" type="Bool">
-      <default>false</default>
+      <default>true</default>
     </entry>
+
     <entry name="sourceInsteadofSink" type="Bool">
       <default>false</default>
     </entry>
+
     <entry name="defaultIconName" type="String">
       <default>audio-card</default>
     </entry>
+
   </group>
 
 </kcfg>

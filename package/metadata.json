@@ -24,6 +24,6 @@
         "Website": "https://github.com/denilsonsa/plasma-audio-device-switcher"
     },
     "KPackageStructure": "Plasma/Applet",
-    "X-Plasma-API": "declarativeappletscript",
-    "X-Plasma-NotificationArea": "false"
+    "X-Plasma-NotificationArea": "false",
+    "X-Plasma-API-Minimum-Version": "6.0"
 }

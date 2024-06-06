@@ -18,41 +18,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.2
+import QtQuick 6.0
 import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.2 as QtControls
+import QtQuick.Controls 6.0 as QtControls
 
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
 
 // plasma pulseaudio plugin
 import org.kde.plasma.private.volume 0.1
 
-Item {
+PlasmoidItem {
     id: main
 
     Layout.minimumWidth: gridLayout.implicitWidth
     Layout.minimumHeight: gridLayout.implicitHeight
-    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
+    preferredRepresentation: fullRepresentation
 
     property int labeling: plasmoid.configuration.labeling
-    property bool usePortDescription: plasmoid.configuration.usePortDescription
-
+    property int naming: plasmoid.configuration.naming
     property bool useVerticalLayout: plasmoid.configuration.useVerticalLayout
-
     property bool sourceInsteadofSink: plasmoid.configuration.sourceInsteadofSink
 
     readonly property var sinkModelFiltered: PulseObjectFilterModel {
         id: sinkModelFiltered
-        filters: []
         filterOutInactiveDevices: true  // ← This avoids showing devices that can't be selected.
         filterVirtualDevices: false
         sourceModel: SinkModel {}
     }
     readonly property var sourceModelFiltered: PulseObjectFilterModel {
         id: sourceModelFiltered
-        filters: []
         filterOutInactiveDevices: true  // ← This avoids showing devices that can't be selected.
         filterVirtualDevices: false
         sourceModel: SourceModel {}
@@ -77,8 +72,11 @@ Item {
             port = {}
         }
 
-        const iconName          = device.iconName    || ""  // Usually empty, thus useless
-        if (iconName) {
+        const iconName = device.iconName || device.properties["device.icon_name"] || device.properties["device.icon-name"];
+        if (iconName && !/^audio-card/.test(iconName)) {
+            // On my system, `device.properties["device.icon_name"]` is populated, but everything is
+            // either "audio-card-analog-usb" or "audio-card-analog-pci", which share the same icon.
+            // Let's use the device's declared icon as long as it's populated with something useful.
             return iconName;
         }
 
@@ -256,37 +254,53 @@ Item {
         return icon
     }
 
+    function getNaming(model, device, port) {
+        // Node nickname, unless it doesn't exist
+        if (naming !== 0 && naming !== 1 && device.properties) {
+            const nick = device.properties["node.nick"];
+            if (nick) return nick;
+        }
+
+        // Port description, unuless it also doesn't exist
+        if (naming !== 0 && port) {
+            const desc = port.description;
+            if (desc) return desc;
+        }
+
+        // Device description and fallback
+        return model.Description;
+    }
+
     GridLayout {
         id: gridLayout
         flow: useVerticalLayout? GridLayout.TopToBottom : GridLayout.LeftToRight
         anchors.fill: parent
 
-        QtControls.ExclusiveGroup {
-            id: buttonGroup
-        }
-
         Repeater {
             model: filteredModel
 
-            delegate: PlasmaComponents.ToolButton {
+            delegate: QtControls.ToolButton {
+                readonly property var device: model.PulseObject
+                readonly property var currentPort: model.Ports[ActivePortIndex]
+                readonly property string currentDescription: getNaming(model, device, currentPort)
+
                 id: tab
                 enabled: currentPort !== null
 
-                text: labeling != 2 ? currentDescription + (device.muted ? " (muted)" : "") : ""
-                iconName: labeling != 1 ? formFactorIcon(device, currentPort, defaultIconName) : ""
+                text: labeling !== 2 ? currentDescription + (device.muted ? " (muted)" : "") : ""
+                icon.name: labeling !== 1 ? formFactorIcon(device, currentPort, defaultIconName) : ""
 
                 checkable: true
-                exclusiveGroup: buttonGroup
-                tooltip: currentDescription
+                autoExclusive: true
+
+                QtControls.ToolTip {
+                    visible: hovered
+                    text: currentDescription
+                }
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.preferredWidth: -1
-
-
-                readonly property var device: model.PulseObject
-                readonly property var currentPort: model.Ports[ActivePortIndex]
-                readonly property string currentDescription: usePortDescription ? currentPort ? currentPort.description : model.Description : model.Description
 
                 Binding {
                     target: tab

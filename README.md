@@ -21,11 +21,15 @@ These steps are inspired by the [Plasma Widget Tutorial](https://develop.kde.org
 
 There are several ways, just pick one:
 
-* `plasmapkg2 -i package` will install it on `~/.local/share/plasma/plasmoids/`.
-* `plasmapkg2 -g -i package` will install it system-wide.
-* `plasmapkg2 -u package` to upgrade it.
+* Plasma 5 only (probably):
+    * `plasmapkg2 -i package` will install it on `~/.local/share/plasma/plasmoids/`.
+    * `plasmapkg2 -g -i package` will install it system-wide.
+    * `plasmapkg2 -u package` to upgrade it.
+* You can use the [./install_this_repo_as_symlink.sh](./install_this_repo_as_symlink.sh) convenience script.
 * You can also install it manually `cp -a package ~/.local/share/plasma/plasmoids/org.kde.plasma.audiodeviceswitcher-ng/`.
 * Or you can unzip the release zipfile onto that directory.
+
+You may need to log out and log back in to make sure KDE/Plasma can see the manually-installed widget. (If you know a better way, please contribute!)
 
 ## Credits
 
